@@ -1,0 +1,82 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Cliente {
+  id        String   @id @default(uuid())
+  nome      String
+  cpfCnpj   String   @unique
+  createdAt DateTime @default(now())
+
+  veiculos  Veiculo[]
+  ordens    OrdemServico[]
+}
+
+model Veiculo {
+  id        String   @id @default(uuid())
+  placa     String   @unique
+  marca     String
+  modelo    String
+  ano       Int
+
+  clienteId String
+  cliente   Cliente @relation(fields: [clienteId], references: [id])
+
+  ordens    OrdemServico[]
+}
+
+model Servico {
+  id    String @id @default(uuid())
+  nome  String
+  preco Float
+
+  ordens OrdemServicoServico[]
+}
+
+model Peca {
+  id      String @id @default(uuid())
+  nome    String
+  preco   Float
+  estoque Int
+
+  ordens OrdemServicoPeca[]
+}
+
+model OrdemServico {
+  id        String   @id @default(uuid())
+  status    String
+  total     Float
+  createdAt DateTime @default(now())
+
+  clienteId String
+  cliente   Cliente @relation(fields: [clienteId], references: [id])
+
+  veiculoId String
+  veiculo   Veiculo @relation(fields: [veiculoId], references: [id])
+
+  servicos OrdemServicoServico[]
+  pecas    OrdemServicoPeca[]
+}
+
+model OrdemServicoServico {
+  id             String @id @default(uuid())
+  ordemServicoId String
+  servicoId      String
+
+  ordemServico OrdemServico @relation(fields: [ordemServicoId], references: [id])
+  servico      Servico      @relation(fields: [servicoId], references: [id])
+}
+
+model OrdemServicoPeca {
+  id             String @id @default(uuid())
+  ordemServicoId String
+  pecaId         String
+  quantidade     Int
+
+  ordemServico OrdemServico @relation(fields: [ordemServicoId], references: [id])
+  peca          Peca        @relation(fields: [pecaId], references: [id])
+}
