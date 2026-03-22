@@ -290,4 +290,46 @@ routes.patch(
   ordem.updateStatus
 );
 
+/**
+ * @swagger
+ * /ordens/{id}/aprovacao:
+ *   post:
+ *     summary: Aprovar ou recusar orçamento da ordem
+ *     tags: [Ordens]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           example:
+ *             aprovado: true
+ *     responses:
+ *       200:
+ *         description: Status atualizado
+ */
+routes.post(
+  "/ordens/:id/aprovacao",
+  authMiddleware(["admin"]),
+  ordem.approve
+);
+
+/**
+ * @swagger
+ * /ordens/{id}:
+ *   delete:
+ *     summary: Deletar ordem (soft delete)
+ *     tags: [Ordens]
+ *     security:
+ *       - bearerAuth: []
+ */
+routes.delete(
+  "/ordens/:id",
+  authMiddleware(["admin"]),
+  ordem.delete
+);
+
 export default routes;

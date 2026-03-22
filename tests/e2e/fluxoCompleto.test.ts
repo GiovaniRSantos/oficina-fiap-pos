@@ -27,7 +27,7 @@ describe("🔥 Fluxo E2E completo", () => {
       .set("Authorization", `Bearer ${token}`)
       .send({
         nome: `Teste E2E ${unique}`,
-        cpfCnpj: `${unique}` 
+        cpfCnpj: `${unique}`
       });
 
     expect(res.status).toBe(201);
@@ -39,7 +39,7 @@ describe("🔥 Fluxo E2E completo", () => {
       .post("/veiculos")
       .set("Authorization", `Bearer ${token}`)
       .send({
-        placa: `ZZZ${unique.toString().slice(-4)}`, 
+        placa: `ZZZ${unique.toString().slice(-4)}`,
         marca: "Honda",
         modelo: "Civic",
         ano: 2022,
@@ -68,7 +68,7 @@ describe("🔥 Fluxo E2E completo", () => {
       .post("/pecas")
       .set("Authorization", `Bearer ${token}`)
       .send({
-        nome: `Filtro ${unique}`, 
+        nome: `Filtro ${unique}`,
         preco: 80,
         estoque: 10
       });
@@ -97,32 +97,112 @@ describe("🔥 Fluxo E2E completo", () => {
     ordemId = res.body.id;
   });
 
-  it("deve buscar ordem por id", async () => {
+  it("deve ir para DIAGNOSTICO", async () => {
+    const res = await request(app)
+      .patch(`/ordens/${ordemId}/status`)
+      .set("Authorization", `Bearer ${token}`)
+      .send({ status: "DIAGNOSTICO" });
+
+    expect(res.status).toBe(200);
+    expect(res.body.status).toBe("DIAGNOSTICO");
+  });
+
+  it("deve ir para AGUARDANDO_APROVACAO", async () => {
+    const res = await request(app)
+      .patch(`/ordens/${ordemId}/status`)
+      .set("Authorization", `Bearer ${token}`)
+      .send({ status: "AGUARDANDO_APROVACAO" });
+
+    expect(res.status).toBe(200);
+    expect(res.body.status).toBe("AGUARDANDO_APROVACAO");
+  });
+
+  it("deve APROVAR orçamento", async () => {
+    const res = await request(app)
+      .post(`/ordens/${ordemId}/aprovacao`)
+      .set("Authorization", `Bearer ${token}`)
+      .send({ aprovado: true });
+
+    expect(res.status).toBe(200);
+    expect(res.body.status).toBe("EXECUCAO");
+  });
+
+  it("não deve aprovar novamente (regra de negócio)", async () => {
+    const res = await request(app)
+      .post(`/ordens/${ordemId}/aprovacao`)
+      .set("Authorization", `Bearer ${token}`)
+      .send({ aprovado: true });
+
+    expect(res.status).toBeGreaterThanOrEqual(400);
+  });
+
+  it("deve finalizar ordem", async () => {
+    const res1 = await request(app)
+      .patch(`/ordens/${ordemId}/status`)
+      .set("Authorization", `Bearer ${token}`)
+      .send({ status: "FINALIZADA" });
+
+    expect(res1.status).toBe(200);
+
+    const res2 = await request(app)
+      .patch(`/ordens/${ordemId}/status`)
+      .set("Authorization", `Bearer ${token}`)
+      .send({ status: "ENTREGUE" });
+
+    expect(res2.status).toBe(200);
+  });
+
+  it("deve buscar ordem finalizada", async () => {
     const res = await request(app)
       .get(`/ordens/${ordemId}`)
       .set("Authorization", `Bearer ${token}`);
 
     expect(res.status).toBe(200);
-    expect(res.body.id).toBe(ordemId);
+    expect(res.body.status).toBe("ENTREGUE");
   });
 
-  it("deve atualizar status corretamente", async () => {
-    const steps = [
-      "DIAGNOSTICO",
-      "AGUARDANDO_APROVACAO",
-      "EXECUCAO",
-      "FINALIZADA",
-      "ENTREGUE"
-    ];
+  it("deve listar ordens ordenadas corretamente", async () => {
+    const res = await request(app)
+      .get("/ordens")
+      .set("Authorization", `Bearer ${token}`);
 
-    for (const status of steps) {
-      const res = await request(app)
-        .patch(`/ordens/${ordemId}/status`)
-        .set("Authorization", `Bearer ${token}`)
-        .send({ status });
+    expect(res.status).toBe(200);
 
-      expect(res.status).toBe(200);
-      expect(res.body.status).toBe(status);
+    const lista = res.body;
+
+    for (const ordem of lista) {
+      expect(["FINALIZADA", "ENTREGUE"]).not.toContain(ordem.status);
     }
+
+    const prioridade = {
+      EXECUCAO: 1,
+      AGUARDANDO_APROVACAO: 2,
+      DIAGNOSTICO: 3,
+      RECEBIDA: 4
+    } as const;
+
+    for (let i = 0; i < lista.length - 1; i++) {
+      const atual =
+        prioridade[lista[i].status as keyof typeof prioridade];
+
+      const proxima =
+        prioridade[lista[i + 1].status as keyof typeof prioridade];
+
+      expect(atual).toBeLessThanOrEqual(proxima);
+    }
+  });
+
+  it("deve fazer soft delete da ordem", async () => {
+    const resDelete = await request(app)
+      .delete(`/ordens/${ordemId}`)
+      .set("Authorization", `Bearer ${token}`);
+
+    expect(resDelete.status).toBe(204);
+
+    const resGet = await request(app)
+      .get(`/ordens/${ordemId}`)
+      .set("Authorization", `Bearer ${token}`);
+
+    expect(resGet.status).toBeGreaterThanOrEqual(400);
   });
 });

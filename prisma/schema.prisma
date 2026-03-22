@@ -12,21 +12,21 @@ model Cliente {
   cpfCnpj   String   @unique
   createdAt DateTime @default(now())
 
-  veiculos  Veiculo[]
-  ordens    OrdemServico[]
+  veiculos Veiculo[]
+  ordens   OrdemServico[]
 }
 
 model Veiculo {
-  id        String   @id @default(uuid())
-  placa     String   @unique
-  marca     String
-  modelo    String
-  ano       Int
+  id     String @id @default(uuid())
+  placa  String @unique
+  marca  String
+  modelo String
+  ano    Int
 
   clienteId String
   cliente   Cliente @relation(fields: [clienteId], references: [id])
 
-  ordens    OrdemServico[]
+  ordens OrdemServico[]
 }
 
 model Servico {
@@ -47,10 +47,11 @@ model Peca {
 }
 
 model OrdemServico {
-  id        String   @id @default(uuid())
+  id        String    @id @default(uuid())
   status    String
   total     Float
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
+  deletedAt DateTime?
 
   clienteId String
   cliente   Cliente @relation(fields: [clienteId], references: [id])
@@ -78,5 +79,5 @@ model OrdemServicoPeca {
   quantidade     Int
 
   ordemServico OrdemServico @relation(fields: [ordemServicoId], references: [id])
-  peca          Peca        @relation(fields: [pecaId], references: [id])
+  peca         Peca         @relation(fields: [pecaId], references: [id])
 }

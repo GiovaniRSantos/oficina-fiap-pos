@@ -1,27 +1,16 @@
 import { prisma } from "../../../infrastructure/database/prisma";
 
-export class GetOrdemById {
+export class GetOrdemServicoById {
   async execute(id: string) {
-    const ordem = await prisma.ordemServico.findUnique({
-      where: { id },
-      include: {
-        cliente: true,
-        veiculo: true,
-        servicos: {
-          include: {
-            servico: true
-          }
-        },
-        pecas: {
-          include: {
-            peca: true
-          }
-        }
+    const ordem = await prisma.ordemServico.findFirst({
+      where: {
+        id,
+        deletedAt: null 
       }
     });
 
     if (!ordem) {
-      throw new Error("Ordem de serviço não encontrada");
+      throw new Error("Ordem não encontrada");
     }
 
     return ordem;

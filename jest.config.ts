@@ -6,7 +6,10 @@ const config: Config = {
   rootDir: ".",
   testMatch: ["**/tests/**/*.test.ts"],
   moduleFileExtensions: ["ts", "js"],
-  clearMocks: true
+  clearMocks: true,
+  moduleNameMapper: {
+    "^@/(.*)$": "<rootDir>/src/$1"
+  }
 };
 
 export default config;
