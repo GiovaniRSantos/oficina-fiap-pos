@@ -1,0 +1,232 @@
+# Oficina API — Tech Challenge (Fase 2)
+
+## Sobre o Projeto
+
+Este projeto consiste na evolução de uma API para gestão de oficina mecânica, contemplando:
+
+* Clientes
+* Veículos
+* Serviços
+* Peças
+* Ordens de Serviço (OS)
+
+A aplicação foi evoluída para atender requisitos de **escalabilidade, qualidade, automação e resiliência**, conforme solicitado na Fase 2 do Tech Challenge.
+
+---
+
+## Arquitetura
+
+A aplicação segue princípios de:
+
+* Clean Architecture
+* Separação de responsabilidades (camadas)
+* Baixo acoplamento
+
+### Estrutura
+
+```
+src/
+ ├── domain/           → regras de negócio (enums, entidades)
+ ├── application/      → use cases
+ ├── infrastructure/   → banco de dados (Prisma)
+ ├── interfaces/       → controllers, rotas e middlewares
+```
+
+---
+
+## Tecnologias Utilizadas
+
+* Node.js + TypeScript
+* Express
+* Prisma ORM
+* PostgreSQL
+* Jest + Supertest (testes E2E)
+* Docker
+* Kubernetes (K8s)
+* Terraform (infraestrutura como código)
+* GitHub Actions (CI/CD)
+* Swagger (documentação)
+
+---
+
+## Autenticação
+
+A API utiliza **JWT (JSON Web Token)**.
+
+### Login
+
+```
+POST /auth/login
+```
+
+```json
+{
+  "email": "admin@admin.com",
+  "password": "123456"
+}
+```
+
+---
+
+## Documentação da API
+
+Swagger disponível em:
+
+```
+http://localhost:3000/docs
+```
+
+---
+
+## Principais Endpoints
+
+### Clientes
+
+* POST /clientes
+* GET /clientes
+* GET /clientes/:id
+* PUT /clientes/:id
+* DELETE /clientes/:id
+
+### Veículos
+
+* POST /veiculos
+* GET /veiculos
+
+### Serviços
+
+* POST /servicos
+* GET /servicos
+
+### Peças
+
+* POST /pecas
+* GET /pecas
+
+### Ordens de Serviço
+
+* POST /ordens
+* GET /ordens
+* GET /ordens/:id
+* PATCH /ordens/:id/status
+* POST /ordens/:id/aprovacao
+* DELETE /ordens/:id (soft delete)
+
+---
+
+## Regras de Negócio
+
+### Status da OS
+
+```
+RECEBIDA → DIAGNOSTICO → AGUARDANDO_APROVACAO → EXECUCAO → FINALIZADA → ENTREGUE
+```
+
+---
+
+### Aprovação de Orçamento
+
+* Endpoint: `POST /ordens/:id/aprovacao`
+* Simula integração externa
+
+---
+
+### Ordenação de OS
+
+* EXECUCAO > AGUARDANDO_APROVACAO > DIAGNOSTICO > RECEBIDA
+* Mais antigas primeiro
+* FINALIZADA e ENTREGUE não aparecem
+
+---
+
+### Soft Delete
+
+* Exclusão lógica usando `deletedAt`
+* Dados não são removidos do banco
+
+---
+
+## Testes
+
+Rodar testes:
+
+```bash
+npm test
+```
+
+Cobertura inclui:
+
+* Fluxo completo E2E
+* Regras de negócio
+* Cenários de erro
+
+---
+
+## Executando com Docker
+
+```bash
+docker-compose up --build
+```
+
+---
+
+## Kubernetes
+
+Aplicar os manifests:
+
+```bash
+kubectl apply -f k8s/
+```
+
+Verificar pods:
+
+```bash
+kubectl get pods
+```
+
+---
+
+## Escalabilidade (HPA)
+
+A aplicação utiliza Horizontal Pod Autoscaler para escalar conforme uso de CPU.
+
+---
+
+## Terraform
+
+Provisionamento de infraestrutura:
+
+```bash
+cd infra
+terraform init
+terraform apply
+```
+
+---
+
+## CI/CD
+
+Pipeline com GitHub Actions que executa:
+
+* Build da aplicação
+* Testes automatizados
+* Build da imagem Docker
+* Deploy no Kubernetes
+
+---
+
+## Execução Local
+
+```bash
+npm install
+npx prisma migrate dev
+npm run dev
+```
+
+---
+
+## Repositório
+
+*https://github.com/GiovaniRSantos/oficina-fiap-pos*
+
+
