@@ -73,4 +73,4 @@ jobs:
 
       - name: Deploy no Kubernetes (manual)
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: echo "✅ Imagem publicada no Docker Hub. Deploy manual via: kubectl apply -f k8s/"
+        run: echo "Imagem publicada no Docker Hub. Deploy manual via kubectl apply -f k8s/"
