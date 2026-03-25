@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: api
-          image: oficina-api:latest
+          image: xungrelo/oficina-api:latest
           ports:
             - containerPort: 3000
           resources:

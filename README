@@ -102,18 +102,18 @@ GitHub Actions (.github/workflows/ci.yml)
 
 ## Tecnologias Utilizadas
 
-| Categoria       | Tecnologia                      |
-| --------------- | ------------------------------- |
-| Runtime         | Node.js 20 + TypeScript         |
-| Framework       | Express                         |
-| ORM             | Prisma                          |
-| Banco de dados  | PostgreSQL 15                   |
-| Testes          | Jest + Supertest (E2E)          |
-| Containerização | Docker + Docker Compose         |
-| Orquestração    | Kubernetes (K8s)                |
-| IaC             | Terraform (Kubernetes Provider) |
-| CI/CD           | GitHub Actions                  |
-| Documentação    | Swagger UI                      |
+| Categoria | Tecnologia |
+|---|---|
+| Runtime | Node.js 20 + TypeScript |
+| Framework | Express |
+| ORM | Prisma |
+| Banco de dados | PostgreSQL 15 |
+| Testes | Jest + Supertest (E2E) |
+| Containerização | Docker + Docker Compose |
+| Orquestração | Kubernetes (K8s) |
+| IaC | Terraform (Kubernetes Provider) |
+| CI/CD | GitHub Actions |
+| Documentação | Swagger UI |
 
 ---
 
@@ -153,55 +153,55 @@ http://localhost:3000/docs
 ## Endpoints
 
 ### Auth
-| Método | Rota        | Descrição                       |
-| ------ | ----------- | ------------------------------- |
-| POST   | /auth/login | Autenticação e geração de token |
+| Método | Rota | Descrição |
+|---|---|---|
+| POST | /auth/login | Autenticação e geração de token |
 
 ### Clientes
-| Método | Rota          | Descrição       |
-| ------ | ------------- | --------------- |
-| POST   | /clientes     | Criar cliente   |
-| GET    | /clientes     | Listar clientes |
-| GET    | /clientes/:id | Buscar por ID   |
-| PUT    | /clientes/:id | Atualizar       |
-| DELETE | /clientes/:id | Soft delete     |
+| Método | Rota | Descrição |
+|---|---|---|
+| POST | /clientes | Criar cliente |
+| GET | /clientes | Listar clientes |
+| GET | /clientes/:id | Buscar por ID |
+| PUT | /clientes/:id | Atualizar |
+| DELETE | /clientes/:id | Soft delete |
 
 ### Veículos
-| Método | Rota          | Descrição       |
-| ------ | ------------- | --------------- |
-| POST   | /veiculos     | Criar veículo   |
-| GET    | /veiculos     | Listar veículos |
-| GET    | /veiculos/:id | Buscar por ID   |
-| PUT    | /veiculos/:id | Atualizar       |
-| DELETE | /veiculos/:id | Soft delete     |
+| Método | Rota | Descrição |
+|---|---|---|
+| POST | /veiculos | Criar veículo |
+| GET | /veiculos | Listar veículos |
+| GET | /veiculos/:id | Buscar por ID |
+| PUT | /veiculos/:id | Atualizar |
+| DELETE | /veiculos/:id | Soft delete |
 
 ### Serviços
-| Método | Rota          | Descrição       |
-| ------ | ------------- | --------------- |
-| POST   | /servicos     | Criar serviço   |
-| GET    | /servicos     | Listar serviços |
-| GET    | /servicos/:id | Buscar por ID   |
-| PUT    | /servicos/:id | Atualizar       |
-| DELETE | /servicos/:id | Soft delete     |
+| Método | Rota | Descrição |
+|---|---|---|
+| POST | /servicos | Criar serviço |
+| GET | /servicos | Listar serviços |
+| GET | /servicos/:id | Buscar por ID |
+| PUT | /servicos/:id | Atualizar |
+| DELETE | /servicos/:id | Soft delete |
 
 ### Peças
-| Método | Rota       | Descrição     |
-| ------ | ---------- | ------------- |
-| POST   | /pecas     | Criar peça    |
-| GET    | /pecas     | Listar peças  |
-| GET    | /pecas/:id | Buscar por ID |
-| PUT    | /pecas/:id | Atualizar     |
-| DELETE | /pecas/:id | Soft delete   |
+| Método | Rota | Descrição |
+|---|---|---|
+| POST | /pecas | Criar peça |
+| GET | /pecas | Listar peças |
+| GET | /pecas/:id | Buscar por ID |
+| PUT | /pecas/:id | Atualizar |
+| DELETE | /pecas/:id | Soft delete |
 
 ### Ordens de Serviço
-| Método | Rota                  | Descrição                        |
-| ------ | --------------------- | -------------------------------- |
-| POST   | /ordens               | Abrir OS                         |
-| GET    | /ordens               | Listar OS (ordenadas por status) |
-| GET    | /ordens/:id           | Consultar status da OS           |
-| PATCH  | /ordens/:id/status    | Atualizar status                 |
-| POST   | /ordens/:id/aprovacao | Aprovação/recusa de orçamento    |
-| DELETE | /ordens/:id           | Soft delete                      |
+| Método | Rota | Descrição |
+|---|---|---|
+| POST | /ordens | Abrir OS |
+| GET | /ordens | Listar OS (ordenadas por status) |
+| GET | /ordens/:id | Consultar status da OS |
+| PATCH | /ordens/:id/status | Atualizar status |
+| POST | /ordens/:id/aprovacao | Aprovação/recusa de orçamento |
+| DELETE | /ordens/:id | Soft delete |
 
 ---
 
@@ -330,15 +330,15 @@ Acesse em `http://localhost:3000`.
 
 ### Estrutura dos manifests (`/k8s`)
 
-| Arquivo               | Descrição                                       |
-| --------------------- | ----------------------------------------------- |
-| `api-deployment.yaml` | Deployment da API                               |
-| `api-service.yaml`    | Service LoadBalancer da API (porta 80)          |
-| `db-deployment.yaml`  | Deployment do PostgreSQL                        |
-| `db-service.yaml`     | Service ClusterIP do banco (porta 5432)         |
-| `hpa.yaml`            | HPA — escala de 1 a 5 réplicas quando CPU > 50% |
-| `configmap.yaml`      | Variáveis não sensíveis (NODE_ENV)              |
-| `secret.yaml`         | Variáveis sensíveis (DATABASE_URL, JWT_SECRET)  |
+| Arquivo | Descrição |
+|---|---|
+| `api-deployment.yaml` | Deployment da API |
+| `api-service.yaml` | Service LoadBalancer da API (porta 80) |
+| `db-deployment.yaml` | Deployment do PostgreSQL |
+| `db-service.yaml` | Service ClusterIP do banco (porta 5432) |
+| `hpa.yaml` | HPA — escala de 1 a 5 réplicas quando CPU > 50% |
+| `configmap.yaml` | Variáveis não sensíveis (NODE_ENV) |
+| `secret.yaml` | Variáveis sensíveis (DATABASE_URL, JWT_SECRET) |
 
 ### Observar o escalonamento automático
 
@@ -410,20 +410,86 @@ terraform destroy
 
 ---
 
+## Notificação por E-mail
+
+A API integra com **Nodemailer + Mailtrap** para notificar automaticamente sobre atualizações de status das Ordens de Serviço.
+
+### Como funciona
+
+Sempre que o status de uma OS é atualizado via `PATCH /ordens/:id/status`, um e-mail é disparado automaticamente com a nova situação da ordem.
+
+### Tecnologias
+
+- **Nodemailer** — envio de e-mails via SMTP
+- **Mailtrap** — sandbox de e-mail para desenvolvimento/testes (captura os e-mails sem enviá-los de verdade)
+
+### Configuração
+
+Adicione as variáveis no `.env`:
+
+```env
+MAIL_HOST=sandbox.smtp.mailtrap.io
+MAIL_PORT=2525
+MAIL_USER=seu_usuario_mailtrap
+MAIL_PASS=sua_senha_mailtrap
+MAIL_FROM=noreply@oficina.com
+```
+
+As credenciais estão disponíveis em [mailtrap.io](https://mailtrap.io) → **Inboxes → SMTP Settings**.
+
+### Testando o envio
+
+1. Acesse [mailtrap.io](https://mailtrap.io) e abra sua inbox
+2. Atualize o status de uma OS:
+
+```bash
+PATCH /ordens/:id/status
+```
+
+```json
+{
+  "status": "DIAGNOSTICO"
+}
+```
+
+3. O e-mail aparecerá capturado na inbox do Mailtrap
+
+### Variáveis de Ambiente no Kubernetes
+
+Adicione as credenciais ao `secret.yaml`:
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: oficina-secret
+type: Opaque
+stringData:
+  DATABASE_URL: postgresql://postgres:postgres@db:5432/oficina
+  JWT_SECRET: supersecret
+  MAIL_HOST: sandbox.smtp.mailtrap.io
+  MAIL_PORT: "2525"
+  MAIL_USER: seu_usuario_mailtrap
+  MAIL_PASS: sua_senha_mailtrap
+  MAIL_FROM: noreply@oficina.com
+```
+
+---
+
 ## CI/CD — GitHub Actions
 
 Pipeline em `.github/workflows/ci.yml`, executado a cada push na `main`:
 
-| Step                  | Descrição                              |
-| --------------------- | -------------------------------------- |
-| Checkout              | Clona o repositório                    |
-| Setup Node 20         | Configura o ambiente Node.js           |
-| npm install           | Instala as dependências                |
-| prisma generate       | Gera o Prisma Client                   |
-| prisma migrate deploy | Aplica as migrations no banco de teste |
-| npm test              | Executa os testes E2E com Jest         |
-| npm run build         | Compila o TypeScript                   |
-| docker build          | Constrói e valida a imagem Docker      |
+| Step                   | Descrição                                      |
+|------------------------|-----------------------------------------------|
+| Checkout               | Clona o repositório                           |
+| Setup Node 20          | Configura o ambiente Node.js                  |
+| npm install            | Instala as dependências                       |
+| prisma generate        | Gera o Prisma Client                          |
+| prisma migrate deploy  | Aplica as migrations no banco de teste        |
+| npm test               | Executa os testes E2E com Jest                |
+| npm run build          | Compila o TypeScript                          |
+| docker build           | Constrói e valida a imagem Docker             |
 
 ---
 
@@ -431,4 +497,3 @@ Pipeline em `.github/workflows/ci.yml`, executado a cada push na `main`:
 
 [https://github.com/GiovaniRSantos/oficina-fiap-pos](https://github.com/GiovaniRSantos/oficina-fiap-pos)
 
----
