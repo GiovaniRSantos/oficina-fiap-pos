@@ -1,4 +1,4 @@
-import { OrdemStatus } from "@/domain/enums/ordemStatus";
+import { OrdemStatus } from "../../../domain/enums/ordemStatus";
 import { prisma } from "../../../infrastructure/database/prisma";
 
 export class ApproveOrdemServico {

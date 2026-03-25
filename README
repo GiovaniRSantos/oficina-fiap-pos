@@ -2,56 +2,128 @@
 
 ## Sobre o Projeto
 
-Este projeto consiste na evolução de uma API para gestão de oficina mecânica, contemplando:
+API REST para gestão de oficina mecânica, desenvolvida em **Node.js + TypeScript**, evoluída na Fase 2 do Tech Challenge FIAP SOAT para atender requisitos de escalabilidade, qualidade, automação e resiliência.
 
-* Clientes
-* Veículos
-* Serviços
-* Peças
-* Ordens de Serviço (OS)
+Funcionalidades cobertas:
+- Clientes, Veículos, Serviços, Peças
+- Ordens de Serviço com fluxo completo de status
+- Autenticação via JWT
+- Escalabilidade automática com Kubernetes + HPA
+- Infraestrutura como Código com Terraform
+- CI/CD com GitHub Actions
 
-A aplicação foi evoluída para atender requisitos de **escalabilidade, qualidade, automação e resiliência**, conforme solicitado na Fase 2 do Tech Challenge.
+---
+
+## Objetivos da Fase 2
+
+- Refatorar o código aplicando Clean Code e Clean Architecture
+- Cobrir fluxos críticos com testes automatizados (E2E)
+- Containerizar a aplicação com Docker
+- Orquestrar com Kubernetes e escalar automaticamente via HPA
+- Provisionar infraestrutura com Terraform
+- Automatizar build, testes e deploy com GitHub Actions
 
 ---
 
 ## Arquitetura
 
-A aplicação segue princípios de:
+### Componentes da Aplicação
 
-* Clean Architecture
-* Separação de responsabilidades (camadas)
-* Baixo acoplamento
-
-### Estrutura
+A aplicação segue **Clean Architecture**, com camadas bem definidas:
 
 ```
 src/
- ├── domain/           → regras de negócio (enums, entidades)
- ├── application/      → use cases
- ├── infrastructure/   → banco de dados (Prisma)
- ├── interfaces/       → controllers, rotas e middlewares
+ ├── domain/                  → Enums e regras de negócio puras
+ │    └── enums/
+ │         └── ordemStatus.ts
+ ├── application/             → Use cases e DTOs
+ │    ├── dtos/
+ │    └── use-cases/
+ │         ├── auth/
+ │         ├── cliente/
+ │         ├── veiculo/
+ │         ├── servico/
+ │         ├── peca/
+ │         └── ordemServico/
+ ├── infrastructure/          → Banco de dados (Prisma), Auth (JWT), Terraform
+ │    ├── auth/
+ │    ├── database/
+ │    └── terraform/
+ └── interfaces/              → Controllers, rotas HTTP, middlewares
+      └── http/
+           ├── controllers/
+           ├── middlewares/
+           └── routes/
+```
+
+### Infraestrutura Kubernetes
+
+```
+┌──────────────────────────────────────────────────────┐
+│                  Kubernetes Cluster                   │
+│                                                      │
+│  ┌──────────────────────┐   ┌──────────────────────┐ │
+│  │   oficina-api        │   │      postgres         │ │
+│  │   Deployment         │   │      Deployment       │ │
+│  │   réplicas: 1-5 (HPA)│   │      réplicas: 1      │ │
+│  └──────────┬───────────┘   └──────────┬────────────┘ │
+│             │                           │              │
+│  ┌──────────▼───────────┐   ┌──────────▼────────────┐ │
+│  │  oficina-api-service │   │     db (Service)      │ │
+│  │  LoadBalancer :80    │   │     ClusterIP :5432   │ │
+│  └──────────────────────┘   └───────────────────────┘ │
+│                                                       │
+│  ┌──────────────────────┐   ┌───────────────────────┐ │
+│  │  HPA                 │   │  Secret + ConfigMap   │ │
+│  │  CPU target: 50%     │   │  DATABASE_URL         │ │
+│  │  min: 1 / max: 5     │   │  JWT_SECRET           │ │
+│  └──────────────────────┘   └───────────────────────┘ │
+└──────────────────────────────────────────────────────┘
+```
+
+### Fluxo de Deploy (CI/CD)
+
+```
+Push para main
+      │
+      ▼
+GitHub Actions (.github/workflows/ci.yml)
+      │
+      ├── 1. Checkout do código
+      ├── 2. Setup Node.js 20
+      ├── 3. npm install
+      ├── 4. prisma generate + migrate deploy
+      ├── 5. npm test (Jest E2E)
+      ├── 6. npm run build
+      └── 7. docker build
 ```
 
 ---
 
 ## Tecnologias Utilizadas
 
-* Node.js + TypeScript
-* Express
-* Prisma ORM
-* PostgreSQL
-* Jest + Supertest (testes E2E)
-* Docker
-* Kubernetes (K8s)
-* Terraform (infraestrutura como código)
-* GitHub Actions (CI/CD)
-* Swagger (documentação)
+| Categoria       | Tecnologia                      |
+| --------------- | ------------------------------- |
+| Runtime         | Node.js 20 + TypeScript         |
+| Framework       | Express                         |
+| ORM             | Prisma                          |
+| Banco de dados  | PostgreSQL 15                   |
+| Testes          | Jest + Supertest (E2E)          |
+| Containerização | Docker + Docker Compose         |
+| Orquestração    | Kubernetes (K8s)                |
+| IaC             | Terraform (Kubernetes Provider) |
+| CI/CD           | GitHub Actions                  |
+| Documentação    | Swagger UI                      |
 
 ---
 
 ## Autenticação
 
-A API utiliza **JWT (JSON Web Token)**.
+A API utiliza **JWT (JSON Web Token)**. Todas as rotas (exceto `/auth/login`) exigem o header:
+
+```
+Authorization: Bearer <token>
+```
 
 ### Login
 
@@ -68,9 +140,9 @@ POST /auth/login
 
 ---
 
-## Documentação da API
+## Documentação da API (Swagger)
 
-Swagger disponível em:
+Com a aplicação rodando, acesse:
 
 ```
 http://localhost:3000/docs
@@ -78,155 +150,285 @@ http://localhost:3000/docs
 
 ---
 
-## Principais Endpoints
+## Endpoints
+
+### Auth
+| Método | Rota        | Descrição                       |
+| ------ | ----------- | ------------------------------- |
+| POST   | /auth/login | Autenticação e geração de token |
 
 ### Clientes
-
-* POST /clientes
-* GET /clientes
-* GET /clientes/:id
-* PUT /clientes/:id
-* DELETE /clientes/:id
+| Método | Rota          | Descrição       |
+| ------ | ------------- | --------------- |
+| POST   | /clientes     | Criar cliente   |
+| GET    | /clientes     | Listar clientes |
+| GET    | /clientes/:id | Buscar por ID   |
+| PUT    | /clientes/:id | Atualizar       |
+| DELETE | /clientes/:id | Soft delete     |
 
 ### Veículos
-
-* POST /veiculos
-* GET /veiculos
+| Método | Rota          | Descrição       |
+| ------ | ------------- | --------------- |
+| POST   | /veiculos     | Criar veículo   |
+| GET    | /veiculos     | Listar veículos |
+| GET    | /veiculos/:id | Buscar por ID   |
+| PUT    | /veiculos/:id | Atualizar       |
+| DELETE | /veiculos/:id | Soft delete     |
 
 ### Serviços
-
-* POST /servicos
-* GET /servicos
+| Método | Rota          | Descrição       |
+| ------ | ------------- | --------------- |
+| POST   | /servicos     | Criar serviço   |
+| GET    | /servicos     | Listar serviços |
+| GET    | /servicos/:id | Buscar por ID   |
+| PUT    | /servicos/:id | Atualizar       |
+| DELETE | /servicos/:id | Soft delete     |
 
 ### Peças
-
-* POST /pecas
-* GET /pecas
+| Método | Rota       | Descrição     |
+| ------ | ---------- | ------------- |
+| POST   | /pecas     | Criar peça    |
+| GET    | /pecas     | Listar peças  |
+| GET    | /pecas/:id | Buscar por ID |
+| PUT    | /pecas/:id | Atualizar     |
+| DELETE | /pecas/:id | Soft delete   |
 
 ### Ordens de Serviço
-
-* POST /ordens
-* GET /ordens
-* GET /ordens/:id
-* PATCH /ordens/:id/status
-* POST /ordens/:id/aprovacao
-* DELETE /ordens/:id (soft delete)
+| Método | Rota                  | Descrição                        |
+| ------ | --------------------- | -------------------------------- |
+| POST   | /ordens               | Abrir OS                         |
+| GET    | /ordens               | Listar OS (ordenadas por status) |
+| GET    | /ordens/:id           | Consultar status da OS           |
+| PATCH  | /ordens/:id/status    | Atualizar status                 |
+| POST   | /ordens/:id/aprovacao | Aprovação/recusa de orçamento    |
+| DELETE | /ordens/:id           | Soft delete                      |
 
 ---
 
 ## Regras de Negócio
 
-### Status da OS
+### Fluxo de Status da OS
 
 ```
 RECEBIDA → DIAGNOSTICO → AGUARDANDO_APROVACAO → EXECUCAO → FINALIZADA → ENTREGUE
 ```
 
----
+### Ordenação na Listagem (`GET /ordens`)
 
-### Aprovação de Orçamento
+```
+EM EXECUCAO > AGUARDANDO_APROVACAO > DIAGNOSTICO > RECEBIDA
+```
 
-* Endpoint: `POST /ordens/:id/aprovacao`
-* Simula integração externa
-
----
-
-### Ordenação de OS
-
-* EXECUCAO > AGUARDANDO_APROVACAO > DIAGNOSTICO > RECEBIDA
-* Mais antigas primeiro
-* FINALIZADA e ENTREGUE não aparecem
-
----
+- Mais antigas primeiro dentro do mesmo status
+- OS com status `FINALIZADA` ou `ENTREGUE` não aparecem na listagem
 
 ### Soft Delete
 
-* Exclusão lógica usando `deletedAt`
-* Dados não são removidos do banco
+- Exclusão lógica via campo `deletedAt`
+- Registros nunca são removidos fisicamente do banco
 
 ---
 
 ## Testes
 
-Rodar testes:
-
 ```bash
 npm test
 ```
 
-Cobertura inclui:
-
-* Fluxo completo E2E
-* Regras de negócio
-* Cenários de erro
-
----
-
-## Executando com Docker
-
-```bash
-docker-compose up --build
-```
-
----
-
-## Kubernetes
-
-Aplicar os manifests:
-
-```bash
-kubectl apply -f k8s/
-```
-
-Verificar pods:
-
-```bash
-kubectl get pods
-```
-
----
-
-## Escalabilidade (HPA)
-
-A aplicação utiliza Horizontal Pod Autoscaler para escalar conforme uso de CPU.
-
----
-
-## Terraform
-
-Provisionamento de infraestrutura:
-
-```bash
-cd infra
-terraform init
-terraform apply
-```
-
----
-
-## CI/CD
-
-Pipeline com GitHub Actions que executa:
-
-* Build da aplicação
-* Testes automatizados
-* Build da imagem Docker
-* Deploy no Kubernetes
+Cobertura:
+- `tests/e2e/fluxoCompleto.test.ts` — fluxo completo de OS (abertura → aprovação → execução → finalização)
+- `tests/e2e/errors.test.ts` — cenários de erro e validações
 
 ---
 
 ## Execução Local
 
+### Com Docker Compose (recomendado)
+
 ```bash
+docker-compose up --build
+```
+
+A API estará disponível em `http://localhost:3000`.
+
+### Manual
+
+```bash
+# 1. Instalar dependências
 npm install
+
+# 2. Gerar o Prisma Client
+npx prisma generate
+
+# 3. Rodar as migrations
 npx prisma migrate dev
+
+# 4. Iniciar a aplicação
 npm run dev
 ```
+
+### Variáveis de Ambiente (`.env`)
+
+```env
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/oficina
+JWT_SECRET=supersecret
+```
+
+---
+
+## Deploy em Kubernetes
+
+### Pré-requisitos
+
+- kubectl configurado
+- Cluster Kubernetes ativo (Docker Desktop, Minikube, etc.)
+- Metrics Server instalado (necessário para o HPA)
+
+### 1. Instalar o Metrics Server (Docker Desktop)
+
+```bash
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+```
+
+Aplicar patch para TLS inseguro (necessário localmente):
+```bash
+kubectl patch deployment metrics-server -n kube-system --type=json --patch-file=patch.json
+```
+
+Conteúdo do `patch.json`:
+```json
+[{"op":"add","path":"/spec/template/spec/containers/0/args/-","value":"--kubelet-insecure-tls"}]
+```
+
+Aguardar o Metrics Server ficar pronto:
+```bash
+kubectl rollout status deployment metrics-server -n kube-system
+kubectl top nodes
+```
+
+### 2. Aplicar os manifests
+
+```bash
+kubectl apply -f k8s/
+```
+
+### 3. Verificar os recursos
+
+```bash
+kubectl get pods
+kubectl get services
+kubectl get hpa -w
+```
+
+### 4. Acessar a aplicação
+
+```bash
+kubectl port-forward service/oficina-api-service 3000:80
+```
+
+Acesse em `http://localhost:3000`.
+
+### Estrutura dos manifests (`/k8s`)
+
+| Arquivo               | Descrição                                       |
+| --------------------- | ----------------------------------------------- |
+| `api-deployment.yaml` | Deployment da API                               |
+| `api-service.yaml`    | Service LoadBalancer da API (porta 80)          |
+| `db-deployment.yaml`  | Deployment do PostgreSQL                        |
+| `db-service.yaml`     | Service ClusterIP do banco (porta 5432)         |
+| `hpa.yaml`            | HPA — escala de 1 a 5 réplicas quando CPU > 50% |
+| `configmap.yaml`      | Variáveis não sensíveis (NODE_ENV)              |
+| `secret.yaml`         | Variáveis sensíveis (DATABASE_URL, JWT_SECRET)  |
+
+### Observar o escalonamento automático
+
+```bash
+# Terminal 1 — observar o HPA
+kubectl get hpa -w
+
+# Terminal 2 — observar os pods
+kubectl get pods -w
+
+# Terminal 3 — port-forward
+kubectl port-forward service/oficina-api-service 3000:80
+
+# Terminal 4 — disparar carga
+k6 run tests/load/load-test.js
+```
+
+---
+
+## Infraestrutura como Código (Terraform)
+
+O Terraform provisiona os recursos do cluster Kubernetes local usando o **Kubernetes Provider** da HashiCorp.
+
+### Recursos provisionados
+
+- `kubernetes_deployment` — API e PostgreSQL
+- `kubernetes_service` — LoadBalancer (API) e ClusterIP (DB)
+- `kubernetes_secret` — DATABASE_URL e JWT_SECRET
+- `kubernetes_config_map` — NODE_ENV
+- `kubernetes_horizontal_pod_autoscaler_v2` — HPA com CPU target 50%
+
+### Estrutura (`/src/infrastructure/terraform`)
+
+```
+terraform/
+ ├── main.tf           → Provider Kubernetes e módulos
+ ├── variables.tf      → Variáveis configuráveis
+ ├── outputs.tf        → URL da API
+ └── modules/
+      ├── api/
+      │    └── main.tf → Secret, ConfigMap, Deployment, Service, HPA
+      └── database/
+           └── main.tf → Deployment e Service do PostgreSQL
+```
+
+### Como aplicar
+
+```bash
+cd src/infrastructure/terraform
+
+# Inicializar providers
+terraform init
+
+# Visualizar o plano de execução
+terraform plan
+
+# Aplicar — cria todos os recursos no cluster
+terraform apply
+
+# Destruir — remove todos os recursos
+terraform destroy
+```
+
+> **Atenção:** se já aplicou os YAMLs via `kubectl apply`, remova antes para evitar conflito:
+> ```bash
+> kubectl delete -f k8s/
+> terraform apply
+> ```
+
+---
+
+## CI/CD — GitHub Actions
+
+Pipeline em `.github/workflows/ci.yml`, executado a cada push na `main`:
+
+| Step                  | Descrição                              |
+| --------------------- | -------------------------------------- |
+| Checkout              | Clona o repositório                    |
+| Setup Node 20         | Configura o ambiente Node.js           |
+| npm install           | Instala as dependências                |
+| prisma generate       | Gera o Prisma Client                   |
+| prisma migrate deploy | Aplica as migrations no banco de teste |
+| npm test              | Executa os testes E2E com Jest         |
+| npm run build         | Compila o TypeScript                   |
+| docker build          | Constrói e valida a imagem Docker      |
 
 ---
 
 ## Repositório
 
-*https://github.com/GiovaniRSantos/oficina-fiap-pos*
+[https://github.com/GiovaniRSantos/oficina-fiap-pos](https://github.com/GiovaniRSantos/oficina-fiap-pos)
 
-
+---

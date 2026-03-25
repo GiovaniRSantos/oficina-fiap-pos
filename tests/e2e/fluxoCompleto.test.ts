@@ -27,7 +27,8 @@ describe("🔥 Fluxo E2E completo", () => {
       .set("Authorization", `Bearer ${token}`)
       .send({
         nome: `Teste E2E ${unique}`,
-        cpfCnpj: `${unique}`
+        cpfCnpj: `${unique}`,
+        email: "teste@mailtrap.io"
       });
 
     expect(res.status).toBe(201);

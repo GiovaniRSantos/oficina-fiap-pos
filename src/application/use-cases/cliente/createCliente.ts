@@ -1,7 +1,7 @@
 import { prisma } from "../../../infrastructure/database/prisma";
 
 export class CreateCliente {
-  async execute(data: { nome: string; cpfCnpj: string }) {
+  async execute(data: { nome: string; cpfCnpj: string, email: string }) {
     const existing = await prisma.cliente.findUnique({
       where: { cpfCnpj: data.cpfCnpj }
     });

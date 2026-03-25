@@ -7,13 +7,13 @@ generator client {
 }
 
 model Cliente {
-  id        String   @id @default(uuid())
+  id        String         @id @default(uuid())
   nome      String
-  cpfCnpj   String   @unique
-  createdAt DateTime @default(now())
-
-  veiculos Veiculo[]
-  ordens   OrdemServico[]
+  cpfCnpj   String         @unique
+  createdAt DateTime       @default(now())
+  email     String?
+  veiculos  Veiculo[]
+  ordens    OrdemServico[]
 }
 
 model Veiculo {

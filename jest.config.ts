@@ -8,8 +8,8 @@ const config: Config = {
   moduleFileExtensions: ["ts", "js"],
   clearMocks: true,
   moduleNameMapper: {
-    "^@/(.*)$": "<rootDir>/src/$1"
-  }
+    "^@/(.*)$": "<rootDir>/src/$1",
+  },
 };
 
 export default config;
