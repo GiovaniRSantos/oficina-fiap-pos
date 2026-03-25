@@ -83,4 +83,11 @@ jobs:
 
       - name: Deploy no Kubernetes
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: kubectl apply -f k8s/
+        run: |
+          kubectl apply -f k8s/api-deployment.yaml --validate=false
+          kubectl apply -f k8s/api-service.yaml --validate=false
+          kubectl apply -f k8s/db-deployment.yaml --validate=false
+          kubectl apply -f k8s/db-service.yaml --validate=false
+          kubectl apply -f k8s/configmap.yaml --validate=false
+          kubectl apply -f k8s/secret.yaml --validate=false
+          kubectl apply -f k8s/hpa.yaml --validate=false
