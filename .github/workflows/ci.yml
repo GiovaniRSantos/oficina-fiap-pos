@@ -71,23 +71,6 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/oficina-api:latest
 
-      - name: Configurar kubectl
+      - name: Deploy no Kubernetes (manual)
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        uses: azure/setup-kubectl@v3
-
-      - name: Configurar kubeconfig
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: |
-          mkdir -p ~/.kube
-          echo "${{ secrets.KUBE_CONFIG }}" > ~/.kube/config
-
-      - name: Deploy no Kubernetes
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: |
-          kubectl apply -f k8s/api-deployment.yaml --validate=false
-          kubectl apply -f k8s/api-service.yaml --validate=false
-          kubectl apply -f k8s/db-deployment.yaml --validate=false
-          kubectl apply -f k8s/db-service.yaml --validate=false
-          kubectl apply -f k8s/configmap.yaml --validate=false
-          kubectl apply -f k8s/secret.yaml --validate=false
-          kubectl apply -f k8s/hpa.yaml --validate=false
+        run: echo "✅ Imagem publicada no Docker Hub. Deploy manual via: kubectl apply -f k8s/"
