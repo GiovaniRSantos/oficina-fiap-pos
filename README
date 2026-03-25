@@ -45,10 +45,9 @@ src/
  │         ├── servico/
  │         ├── peca/
  │         └── ordemServico/
- ├── infrastructure/          → Banco de dados (Prisma), Auth (JWT), Terraform
+ ├── infrastructure/          → Banco de dados (Prisma), Auth (JWT)
  │    ├── auth/
- │    ├── database/
- │    └── terraform/
+ │    └── database/
  └── interfaces/              → Controllers, rotas HTTP, middlewares
       └── http/
            ├── controllers/
@@ -95,7 +94,8 @@ GitHub Actions (.github/workflows/ci.yml)
       ├── 4. prisma generate + migrate deploy
       ├── 5. npm test (Jest E2E)
       ├── 6. npm run build
-      └── 7. docker build
+      ├── 7. docker build + push → Docker Hub
+      └── 8. kubectl apply → Kubernetes
 ```
 
 ---
@@ -292,7 +292,7 @@ kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/late
 
 Aplicar patch para TLS inseguro (necessário localmente):
 ```bash
-kubectl patch deployment metrics-server -n kube-system --type=json --patch-file=patch.json
+kubectl patch deployment metrics-server -n kube-system --type=json --patch-file=k8s/patch.json
 ```
 
 Conteúdo do `patch.json`:
@@ -370,10 +370,10 @@ O Terraform provisiona os recursos do cluster Kubernetes local usando o **Kubern
 - `kubernetes_config_map` — NODE_ENV
 - `kubernetes_horizontal_pod_autoscaler_v2` — HPA com CPU target 50%
 
-### Estrutura (`/src/infrastructure/terraform`)
+### Estrutura (`/infra`)
 
 ```
-terraform/
+infra/
  ├── main.tf           → Provider Kubernetes e módulos
  ├── variables.tf      → Variáveis configuráveis
  ├── outputs.tf        → URL da API
@@ -387,7 +387,7 @@ terraform/
 ### Como aplicar
 
 ```bash
-cd src/infrastructure/terraform
+cd infra
 
 # Inicializar providers
 terraform init
@@ -479,7 +479,6 @@ stringData:
 ## CI/CD — GitHub Actions
 
 Pipeline em `.github/workflows/ci.yml`, executado a cada push na `main`:
-
 | Step                   | Descrição                                      |
 |------------------------|-----------------------------------------------|
 | Checkout               | Clona o repositório                           |
@@ -496,4 +495,3 @@ Pipeline em `.github/workflows/ci.yml`, executado a cada push na `main`:
 ## Repositório
 
 [https://github.com/GiovaniRSantos/oficina-fiap-pos](https://github.com/GiovaniRSantos/oficina-fiap-pos)
-
